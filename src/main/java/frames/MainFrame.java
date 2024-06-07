@@ -102,6 +102,15 @@ public class MainFrame extends javax.swing.JFrame {
         return toReturn;
     }
     
+    private boolean isDecimal(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -438,7 +447,15 @@ public class MainFrame extends javax.swing.JFrame {
                         row = sheet.createRow(i);
                     }
                     Cell cell = row.createCell(0);
-                    cell.setCellValue(this.getLatitudeResultList().get(i));
+                    if (!this.isDecimal(this.getLatitudeResultList().get(i))) {
+                        cell.setCellValue(this.getLatitudeResultList().get(i));
+                    } else {
+                        if (!this.getLatitudeResultList().get(i).endsWith("°")) {
+                            cell.setCellValue(this.getLatitudeResultList().get(i) + "°");
+                        } else {
+                            cell.setCellValue(this.getLatitudeResultList().get(i));
+                        }
+                    }
                 }
             }
             if (!this.getLongitudeResultList().isEmpty()) {
@@ -449,7 +466,15 @@ public class MainFrame extends javax.swing.JFrame {
                         row = sheet2.createRow(i);
                     }
                     Cell cell = row.createCell(0);
-                    cell.setCellValue(this.getLongitudeResultList().get(i));
+                    if (!this.isDecimal(this.getLongitudeResultList().get(i))) {
+                        cell.setCellValue(this.getLongitudeResultList().get(i));
+                    } else {
+                        if (!this.getLongitudeResultList().get(i).endsWith("°")) {
+                            cell.setCellValue(this.getLongitudeResultList().get(i) + "°");
+                        } else {
+                            cell.setCellValue(this.getLongitudeResultList().get(i));
+                        }
+                    }
                 }
             }            
 
@@ -467,6 +492,7 @@ public class MainFrame extends javax.swing.JFrame {
                 out.flush();
                 out.close();
             } catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(null, "Something went wrong! if you have any existing result file open, try to close it and then try again.", "Error", JOptionPane.ERROR_MESSAGE);
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);

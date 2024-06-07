@@ -124,6 +124,7 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         txtAreaConvertedLatitudeValues = new javax.swing.JTextArea();
         saveButton = new javax.swing.JButton();
+        clearButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -294,6 +295,13 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        clearButton.setText("Clear results");
+        clearButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout mainPaneLayout = new javax.swing.GroupLayout(mainPane);
         mainPane.setLayout(mainPaneLayout);
         mainPaneLayout.setHorizontalGroup(
@@ -301,7 +309,10 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(mainPaneLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(mainPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(saveButton)
+                    .addGroup(mainPaneLayout.createSequentialGroup()
+                        .addComponent(clearButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saveButton))
                     .addGroup(mainPaneLayout.createSequentialGroup()
                         .addComponent(originalValuesPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -316,7 +327,9 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(originalValuesPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(7, 7, 7)
-                .addComponent(saveButton)
+                .addGroup(mainPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveButton)
+                    .addComponent(clearButton))
                 .addContainerGap())
         );
 
@@ -357,12 +370,12 @@ public class MainFrame extends javax.swing.JFrame {
     private void convertLatitudeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_convertLatitudeButtonActionPerformed
         String str = this.txtAreaLatitudeValues.getText();
         if (!str.isEmpty() && !str.equals("")) {
+            List<String> resultList = new ArrayList<>();
             if (str.contains(",")) {
                 String main_split[] = str.split("\\,");
                 
                 if (main_split.length > 1) {
                     List<String> values = Arrays.stream(main_split).toList();
-                    List<String> resultList = new ArrayList<>(values.size());
                     
                     for (int i = 0; i < values.size(); i++) {
                         String checkingValue = values.get(i);
@@ -370,8 +383,8 @@ public class MainFrame extends javax.swing.JFrame {
                             checkingValue = checkingValue.substring(0, this.findIndex(checkingValue.toCharArray(), '°'));
                         }
                         if (checkingValue.equals("null") || (checkingValue.contains("\"") && checkingValue.contains("\'"))) {
-                            String toSave = this.convertToDecimal(checkingValue, "latitude");
-                            resultList.add(toSave);
+                            String result = this.convertToDecimal(checkingValue, "latitude");
+                            resultList.add(result);
                         } else {
                             resultList.add(checkingValue);
                         }
@@ -384,9 +397,30 @@ public class MainFrame extends javax.swing.JFrame {
                     resultList.forEach(v -> {
                         this.txtAreaConvertedLatitudeValues.setText(this.txtAreaConvertedLatitudeValues.getText().trim() + "\n" + v.trim());
                     });
-                    this.latitudeResultList = resultList;
+                    this.txtAreaLatitudeValues.setText("");
+                } else {
+                    String value = main_split[0];
+                    String result = this.convertToDecimal(value, "latitude");
+                    resultList.add(result);
+                    resultList.forEach(v -> {
+                        this.txtAreaConvertedLatitudeValues.setText(v);
+                    });
+                    this.txtAreaLatitudeValues.setText("");
+                }
+            } else {
+                if (str.contains("°") && str.contains("\"") && str.contains("\'")
+                        && !str.equals("null")) {
+                    String value = this.convertToDecimal(str, "latitude");
+                    resultList.add(value);
+                    resultList.forEach(v -> {
+                        this.txtAreaConvertedLatitudeValues.setText(v);
+                    });
+                    this.txtAreaLatitudeValues.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Incorrect format was written in the latitude area!", "Invalid format", JOptionPane.ERROR_MESSAGE);
                 }
             }
+            this.latitudeResultList = resultList;
         } else {
             JOptionPane.showMessageDialog(null, "No values to convert were detected in the latitude text area.", "No values", JOptionPane.WARNING_MESSAGE);
         }
@@ -428,7 +462,7 @@ public class MainFrame extends javax.swing.JFrame {
                 FileOutputStream out = new FileOutputStream(file);
                 wb.write(out);
                 
-                JOptionPane.showMessageDialog(null, "The converted values were saved at " + file.getAbsolutePath());
+                JOptionPane.showMessageDialog(null, "The converted values were saved at " + file.getAbsolutePath(), "Saved", JOptionPane.INFORMATION_MESSAGE);
                 
                 out.flush();
                 out.close();
@@ -451,12 +485,12 @@ public class MainFrame extends javax.swing.JFrame {
     private void convertLongitudeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_convertLongitudeButtonActionPerformed
         String str = this.txtAreaLongitudeValues.getText();
         if (!str.isEmpty() && !str.equals("")) {
+            List<String> resultList = new ArrayList<>();
             if (str.contains(",")) {
                 String main_split[] = str.split("\\,");
                 
                 if (main_split.length > 1) {
                     List<String> values = Arrays.stream(main_split).toList();
-                    List<String> resultList = new ArrayList<>(values.size());
                     
                     for (int i = 0; i < values.size(); i++) {
                         String checkingValue = values.get(i);
@@ -464,8 +498,8 @@ public class MainFrame extends javax.swing.JFrame {
                             checkingValue = checkingValue.substring(0, this.findIndex(checkingValue.toCharArray(), '°'));
                         }
                         if (checkingValue.equals("null") || (checkingValue.contains("\"") && checkingValue.contains("\'"))) {
-                            String toSave = this.convertToDecimal(checkingValue, "longitude");
-                            resultList.add(toSave);
+                            String result = this.convertToDecimal(checkingValue, "longitude");
+                            resultList.add(result);
                         } else {
                             resultList.add(checkingValue);
                         }
@@ -478,9 +512,30 @@ public class MainFrame extends javax.swing.JFrame {
                     resultList.forEach(v -> {
                         this.txtAreaConvertedLongitudeValues.setText(this.txtAreaConvertedLongitudeValues.getText().trim() + "\n" + v.trim());
                     });
-                    this.longitudeResultList = resultList;
+                    this.txtAreaLongitudeValues.setText("");
+                } else {
+                    String value = main_split[0];
+                    String result = this.convertToDecimal(value, "longitude");
+                    resultList.add(result);
+                    resultList.forEach(v -> {
+                        this.txtAreaConvertedLongitudeValues.setText(v);
+                    });
+                    this.txtAreaLongitudeValues.setText("");
+                }
+            } else {
+                if (str.contains("°") && str.contains("\"") && str.contains("\'")
+                        && !str.equals("null")) {
+                    String value = this.convertToDecimal(str, "longitude");
+                    resultList.add(value);
+                    resultList.forEach(v -> {
+                        this.txtAreaConvertedLongitudeValues.setText(v);
+                    });
+                    this.txtAreaLongitudeValues.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Incorrect format was written in the longitude area!", "Invalid format", JOptionPane.ERROR_MESSAGE);
                 }
             }
+            this.longitudeResultList = resultList;
         } else {
             JOptionPane.showMessageDialog(null, "No values to convert were detected in the longitude text area.", "No values", JOptionPane.WARNING_MESSAGE);
         }
@@ -500,7 +555,28 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_uploadLongitudeButtonActionPerformed
 
+    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
+        if (!this.txtAreaConvertedLatitudeValues.getText().isEmpty()
+                || !this.txtAreaConvertedLongitudeValues.getText().isEmpty()) {
+            if (JOptionPane.showConfirmDialog(null, "Do you want to clear the result area?", "Clear", 
+                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                this.txtAreaConvertedLatitudeValues.setText("");
+                this.txtAreaConvertedLongitudeValues.setText("");
+
+                this.latitudeResultList.clear();
+                this.longitudeResultList.clear();
+                
+                JOptionPane.showMessageDialog(null, "The result area was successfully cleared.", "Clear", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                //////////////////////////////////////////////////////
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "The results area are already clear or do not have any data yet.", "Clear", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_clearButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton clearButton;
     private javax.swing.JButton convertLatitudeButton;
     private javax.swing.JButton convertLongitudeButton;
     private javax.swing.JPanel jPanel1;
